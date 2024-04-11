@@ -37,8 +37,7 @@ void main() {
     expect(
         instance
             .collection('messages')
-            .where('timestamp',
-                isGreaterThan: now.subtract(Duration(seconds: 1)))
+            .where('timestamp', isGreaterThan: now.subtract(Duration(seconds: 1)))
             .snapshots(),
         emits(QuerySnapshotMatcher([
           DocumentSnapshotMatcher.onData({
@@ -48,19 +47,11 @@ void main() {
           })
         ])));
     // Filter out everything and check that there is no result.
-    expect(
-        instance
-            .collection('messages')
-            .where('timestamp', isGreaterThan: now.add(Duration(seconds: 1)))
-            .snapshots(),
+    expect(instance.collection('messages').where('timestamp', isGreaterThan: now.add(Duration(seconds: 1))).snapshots(),
         emits(QuerySnapshotMatcher([])));
     // Test on missing properties.
     expect(
-        instance
-            .collection('messages')
-            .where('length', isGreaterThan: 5)
-            .snapshots(),
-        emits(QuerySnapshotMatcher([])));
+        instance.collection('messages').where('length', isGreaterThan: 5).snapshots(), emits(QuerySnapshotMatcher([])));
   });
 
   test('isLessThanOrEqualTo', () async {
@@ -82,10 +73,7 @@ void main() {
     });
     // Test filtering.
     expect(
-        instance
-            .collection('messages')
-            .where('timestamp', isLessThanOrEqualTo: now)
-            .snapshots(),
+        instance.collection('messages').where('timestamp', isLessThanOrEqualTo: now).snapshots(),
         emits(QuerySnapshotMatcher([
           DocumentSnapshotMatcher.onData({
             'content': 'before',
@@ -99,15 +87,11 @@ void main() {
     expect(
         instance
             .collection('messages')
-            .where('timestamp',
-                isLessThanOrEqualTo: now.subtract(Duration(seconds: 2)))
+            .where('timestamp', isLessThanOrEqualTo: now.subtract(Duration(seconds: 2)))
             .snapshots(),
         emits(QuerySnapshotMatcher([])));
     expect(
-        instance
-            .collection('messages')
-            .where('timestamp', isLessThan: now)
-            .snapshots(),
+        instance.collection('messages').where('timestamp', isLessThan: now).snapshots(),
         emits(QuerySnapshotMatcher([
           DocumentSnapshotMatcher.onData({
             'content': 'before',
@@ -115,16 +99,10 @@ void main() {
           }),
         ])));
     expect(
-        instance
-            .collection('messages')
-            .where('timestamp', isLessThan: now.subtract(Duration(seconds: 2)))
-            .snapshots(),
+        instance.collection('messages').where('timestamp', isLessThan: now.subtract(Duration(seconds: 2))).snapshots(),
         emits(QuerySnapshotMatcher([])));
     expect(
-        instance
-            .collection('messages')
-            .where('timestamp', isGreaterThanOrEqualTo: now)
-            .snapshots(),
+        instance.collection('messages').where('timestamp', isGreaterThanOrEqualTo: now).snapshots(),
         emits(QuerySnapshotMatcher([
           DocumentSnapshotMatcher.onData({
             'content': 'during',
@@ -138,8 +116,7 @@ void main() {
     expect(
         instance
             .collection('messages')
-            .where('timestamp',
-                isGreaterThanOrEqualTo: now.add(Duration(seconds: 2)))
+            .where('timestamp', isGreaterThanOrEqualTo: now.add(Duration(seconds: 2)))
             .snapshots(),
         emits(QuerySnapshotMatcher([])));
   });
@@ -147,8 +124,7 @@ void main() {
   test('isEqualTo, orderBy, limit and getDocuments', () async {
     final instance = FakeFirebaseFirestore();
     final now = DateTime.now();
-    final bookmarks =
-        instance.collection('users').doc(uid).collection('bookmarks');
+    final bookmarks = instance.collection('users').doc(uid).collection('bookmarks');
     await bookmarks.add({
       'hidden': false,
       'timestamp': now,
@@ -184,17 +160,11 @@ void main() {
     await collection.add({'hidden': false, 'id': 'HIDDEN'});
     await collection.add({'hidden': true, 'id': 'VISIBLE'});
 
-    final visibleSnapshot = (await instance
-        .collection('test')
-        .where('hidden', isNotEqualTo: false)
-        .get());
+    final visibleSnapshot = (await instance.collection('test').where('hidden', isNotEqualTo: false).get());
     expect(visibleSnapshot.docs.length, equals(1));
     expect(visibleSnapshot.docs.first.get('id'), equals('VISIBLE'));
 
-    final hiddenSnapshot = (await instance
-        .collection('test')
-        .where('hidden', isNotEqualTo: true)
-        .get());
+    final hiddenSnapshot = (await instance.collection('test').where('hidden', isNotEqualTo: true).get());
     expect(hiddenSnapshot.docs.length, equals(1));
     expect(hiddenSnapshot.docs.first.get('id'), equals('HIDDEN'));
   });
@@ -205,17 +175,11 @@ void main() {
       final collection = instance.collection('test');
       await collection.add({'a': 'b'});
 
-      final visibleSnapshot = (await instance
-          .collection('test')
-          .where('a', isNotEqualTo: '')
-          .get());
+      final visibleSnapshot = (await instance.collection('test').where('a', isNotEqualTo: '').get());
       expect(visibleSnapshot.docs.length, equals(1));
       expect(visibleSnapshot.docs.first.get('a'), equals('b'));
 
-      final emptySnapshot = (await instance
-          .collection('test')
-          .where('c', isNotEqualTo: '')
-          .get());
+      final emptySnapshot = (await instance.collection('test').where('c', isNotEqualTo: '').get());
       expect(emptySnapshot.docs.length, equals(0));
     });
 
@@ -226,17 +190,11 @@ void main() {
         'a': {'b': 'c'}
       });
 
-      final visibleSnapshot = (await instance
-          .collection('test')
-          .where('a.b', isNotEqualTo: '')
-          .get());
+      final visibleSnapshot = (await instance.collection('test').where('a.b', isNotEqualTo: '').get());
       expect(visibleSnapshot.docs.length, equals(1));
       expect(visibleSnapshot.docs.first.get('a.b'), equals('c'));
 
-      final emptySnapshot = (await instance
-          .collection('test')
-          .where('a.c', isNotEqualTo: '')
-          .get());
+      final emptySnapshot = (await instance.collection('test').where('a.c', isNotEqualTo: '').get());
       expect(emptySnapshot.docs.length, equals(0));
     });
 
@@ -247,51 +205,31 @@ void main() {
         'users': {'test@example.com': 'I exist'}
       });
 
-      final visibleSnapshot = (await instance
-          .collection('test')
-          .where(FieldPath(['users', 'test@example.com']), isNotEqualTo: '')
-          .get());
+      final visibleSnapshot =
+          (await instance.collection('test').where(FieldPath(['users', 'test@example.com']), isNotEqualTo: '').get());
       expect(visibleSnapshot.docs.length, equals(1));
-      expect(
-          visibleSnapshot.docs.first
-              .get(FieldPath(['users', 'test@example.com'])),
-          equals('I exist'));
+      expect(visibleSnapshot.docs.first.get(FieldPath(['users', 'test@example.com'])), equals('I exist'));
 
-      final emptySnapshot = (await instance
-          .collection('test')
-          .where(FieldPath(['users', 'bogus@example.com']), isNotEqualTo: '')
-          .get());
+      final emptySnapshot =
+          (await instance.collection('test').where(FieldPath(['users', 'bogus@example.com']), isNotEqualTo: '').get());
       expect(emptySnapshot.docs.length, equals(0));
     });
   });
 
   test('isNull where clause', () async {
     final instance = FakeFirebaseFirestore();
-    await instance
-        .collection('contestants')
-        .add({'name': 'Alice', 'country': 'USA', 'experience': '5'});
+    await instance.collection('contestants').add({'name': 'Alice', 'country': 'USA', 'experience': '5'});
 
-    await instance
-        .collection('contestants')
-        .add({'name': 'Tom', 'country': 'USA'});
+    await instance.collection('contestants').add({'name': 'Tom', 'country': 'USA'});
 
-    final nonNullFieldSnapshot = (await instance
-        .collection('contestants')
-        .where('country', isNull: false)
-        .get());
+    final nonNullFieldSnapshot = (await instance.collection('contestants').where('country', isNull: false).get());
     expect(nonNullFieldSnapshot.docs.length, equals(2));
 
-    final isNotNullFieldSnapshot = (await instance
-        .collection('contestants')
-        .where('experience', isNull: false)
-        .get());
+    final isNotNullFieldSnapshot = (await instance.collection('contestants').where('experience', isNull: false).get());
     expect(isNotNullFieldSnapshot.docs.length, equals(1));
     expect(isNotNullFieldSnapshot.docs.first.get('name'), equals('Alice'));
 
-    final isNullFieldSnapshot = (await instance
-        .collection('contestants')
-        .where('experience', isNull: true)
-        .get());
+    final isNullFieldSnapshot = (await instance.collection('contestants').where('experience', isNull: true).get());
     expect(isNullFieldSnapshot.docs.length, equals(1));
     expect(isNullFieldSnapshot.docs.first.get('name'), equals('Tom'));
   });
@@ -299,9 +237,7 @@ void main() {
   test('orderBy returns documents with null fields first', () async {
     final instance = FakeFirebaseFirestore();
     await instance.collection('usercourses').add({'completed_at': null});
-    await instance
-        .collection('usercourses')
-        .add({'completed_at': Timestamp.fromDate(DateTime.now())});
+    await instance.collection('usercourses').add({'completed_at': Timestamp.fromDate(DateTime.now())});
 
     var query = instance.collection('usercourses').orderBy('completed_at');
 
@@ -344,8 +280,7 @@ void main() {
       }
     });
 
-    final data =
-        await firestore.collection('test').orderBy('nested.value').get();
+    final data = await firestore.collection('test').orderBy('nested.value').get();
     expect(data.docs.first.get('nested.value'), 2);
     expect(data.docs.first.data()['nested']['value'], 2);
   });
@@ -611,10 +546,7 @@ void main() {
     await instance.collection('users').doc('2').set({'value': 2});
     await instance.collection('users').doc('3').set({'value': 3});
 
-    final snapshot = await instance
-        .collection('users')
-        .where(FieldPath.documentId, isEqualTo: '1')
-        .get();
+    final snapshot = await instance.collection('users').where(FieldPath.documentId, isEqualTo: '1').get();
 
     final documents = snapshot.docs;
 
@@ -630,8 +562,7 @@ void main() {
 
     final snapshot = await instance
         .collection('users')
-        .where(FieldPath.documentId,
-            isEqualTo: instance.collection('users').doc('1'))
+        .where(FieldPath.documentId, isEqualTo: instance.collection('users').doc('1'))
         .get();
 
     final documents = snapshot.docs;
@@ -651,8 +582,7 @@ void main() {
 
   test('Chained where queries return the correct snapshots', () async {
     final instance = FakeFirebaseFirestore();
-    final bookmarks =
-        instance.collection('users').doc(uid).collection('bookmarks');
+    final bookmarks = instance.collection('users').doc(uid).collection('bookmarks');
     await bookmarks.add({
       'hidden': false,
     });
@@ -746,13 +676,9 @@ void main() {
 
       await instance.collection('messages').doc().set({'Username': 'John'});
 
-      final documentSnapshot =
-          await instance.collection('messages').doc(uid).get();
+      final documentSnapshot = await instance.collection('messages').doc(uid).get();
 
-      final snapshots = await instance
-          .collection('messages')
-          .startAfterDocument(documentSnapshot)
-          .get();
+      final snapshots = await instance.collection('messages').startAfterDocument(documentSnapshot).get();
 
       expect(snapshots.docs, hasLength(2));
       expect(
@@ -771,13 +697,9 @@ void main() {
 
       await instance.collection('messages').doc().set({'Username': 'John'});
 
-      final documentSnapshot =
-          await instance.collection('messages').doc(uid).get();
+      final documentSnapshot = await instance.collection('messages').doc(uid).get();
 
-      final snapshots = await instance
-          .collection('messages')
-          .startAtDocument(documentSnapshot)
-          .get();
+      final snapshots = await instance.collection('messages').startAtDocument(documentSnapshot).get();
 
       expect(snapshots.docs, hasLength(3));
       expect(
@@ -796,13 +718,9 @@ void main() {
 
       await instance.collection('messages').doc().set({'Username': 'John'});
 
-      final documentSnapshot =
-          await instance.collection('messages').doc(uid).get();
+      final documentSnapshot = await instance.collection('messages').doc(uid).get();
 
-      final snapshots = await instance
-          .collection('messages')
-          .endAtDocument(documentSnapshot)
-          .get();
+      final snapshots = await instance.collection('messages').endAtDocument(documentSnapshot).get();
 
       expect(snapshots.docs, hasLength(2));
       expect(
@@ -821,11 +739,7 @@ void main() {
 
       await instance.collection('messages').doc().set({'Username': 'John'});
 
-      final snapshots = await instance
-          .collection('messages')
-          .orderBy('Username')
-          .endBefore(toIterable(['Bob']))
-          .get();
+      final snapshots = await instance.collection('messages').orderBy('Username').endBefore(toIterable(['Bob'])).get();
 
       expect(snapshots.docs, hasLength(1));
       expect(
@@ -844,13 +758,9 @@ void main() {
 
       await instance.collection('messages').doc().set({'Username': 'John'});
 
-      final documentSnapshot =
-          await instance.collection('messages').doc(uid).get();
+      final documentSnapshot = await instance.collection('messages').doc(uid).get();
 
-      final snapshots = await instance
-          .collection('messages')
-          .endBeforeDocument(documentSnapshot)
-          .get();
+      final snapshots = await instance.collection('messages').endBeforeDocument(documentSnapshot).get();
 
       expect(snapshots.docs, hasLength(1));
       expect(
@@ -860,8 +770,7 @@ void main() {
     });
   });
 
-  test('chaining where and startAfterDocument return correct documents',
-      () async {
+  test('chaining where and startAfterDocument return correct documents', () async {
     final instance = FakeFirebaseFirestore();
 
     await instance.collection('messages').doc().set({'username': 'Bob'});
@@ -875,8 +784,7 @@ void main() {
 
     await instance.collection('messages').doc().set({'username': 'Bob'});
 
-    final documentSnapshot =
-        await instance.collection('messages').doc(uid).get();
+    final documentSnapshot = await instance.collection('messages').doc(uid).get();
 
     final querySnapshot = await instance
         .collection('messages')
@@ -892,18 +800,14 @@ void main() {
 
     await instance.collection('messages').doc(uid).set({'username': 'Bob'});
 
-    final documentSnapshot =
-        await instance.collection('messages').doc(uid).get();
+    final documentSnapshot = await instance.collection('messages').doc(uid).get();
 
     await instance.collection('123').doc().set({'tag': 'bike'});
 
     await instance.collection('123').doc().set({'tag': 'chess'});
 
     expect(
-      () async => await instance
-          .collection('123')
-          .startAfterDocument(documentSnapshot)
-          .get(),
+      () async => await instance.collection('123').startAfterDocument(documentSnapshot).get(),
       throwsA(TypeMatcher<PlatformException>()),
     );
   });
@@ -916,10 +820,7 @@ void main() {
     await instance.collection('messages').add({'Username': 'Cris'});
     await instance.collection('messages').add({'Username': 'John'});
 
-    final snapshots = await instance
-        .collection('messages')
-        .orderBy('Username')
-        .startAfter(['Bob']).get();
+    final snapshots = await instance.collection('messages').orderBy('Username').startAfter(['Bob']).get();
 
     expect(snapshots.docs, hasLength(2));
   });
@@ -932,32 +833,21 @@ void main() {
     await instance.collection('messages').add({'Username': 'Cris'});
     await instance.collection('messages').add({'Username': 'John'});
 
-    final snapshots = await instance
-        .collection('messages')
-        .orderBy('Username')
-        .startAfter(['Brice']).get();
+    final snapshots = await instance.collection('messages').orderBy('Username').startAfter(['Brice']).get();
 
     expect(snapshots.docs, hasLength(2));
   });
 
   test('Continuous data receive via stream with where', () async {
     final instance = FakeFirebaseFirestore();
-    instance
-        .collection('messages')
-        .where('archived', isEqualTo: false)
-        .snapshots()
-        .listen(expectAsync1((snapshot) {
+    instance.collection('messages').where('archived', isEqualTo: false).snapshots().listen(expectAsync1((snapshot) {
           expect(snapshot.docs.length, inInclusiveRange(0, 2));
           for (final d in snapshot.docs) {
             expect(d.get('archived'), isFalse);
           }
         }, count: 3)); // initial [], when add 'hello!' and when add 'hola!'.
 
-    instance
-        .collection('messages')
-        .where('archived', isEqualTo: true)
-        .snapshots()
-        .listen(expectAsync1((snapshot) {
+    instance.collection('messages').where('archived', isEqualTo: true).snapshots().listen(expectAsync1((snapshot) {
           expect(snapshot.docs.length, inInclusiveRange(0, 1));
           for (final d in snapshot.docs) {
             expect(d.get('archived'), isTrue);
@@ -983,11 +873,7 @@ void main() {
     });
 
     // check new stream will receive the latest data.
-    instance
-        .collection('messages')
-        .where('archived', isEqualTo: false)
-        .snapshots()
-        .listen(expectAsync1((snapshot) {
+    instance.collection('messages').where('archived', isEqualTo: false).snapshots().listen(expectAsync1((snapshot) {
       expect(snapshot.docs.length, equals(2));
       for (final d in snapshot.docs) {
         expect(d.get('archived'), isFalse);
@@ -995,8 +881,7 @@ void main() {
     }));
   });
 
-  test('Continuous data receive via stream with orderBy (asc and desc)',
-      () async {
+  test('Continuous data receive via stream with orderBy (asc and desc)', () async {
     final now = DateTime.now();
     final testData = <Map<String, dynamic>>[
       {'content': 'hello!', 'receivedAt': now, 'archived': false},
@@ -1024,11 +909,7 @@ void main() {
 
     final instance = FakeFirebaseFirestore();
     var ascCalled = 0;
-    instance
-        .collection('messages')
-        .orderBy('receivedAt')
-        .snapshots()
-        .listen(expectAsync1((snapshot) {
+    instance.collection('messages').orderBy('receivedAt').snapshots().listen(expectAsync1((snapshot) {
           final docs = snapshot.docs;
           try {
             if (ascCalled == 0) {
@@ -1048,11 +929,7 @@ void main() {
           }
         }, count: testData.length + 1));
     var descCalled = 0;
-    instance
-        .collection('messages')
-        .orderBy('receivedAt', descending: true)
-        .snapshots()
-        .listen(expectAsync1((snapshot) {
+    instance.collection('messages').orderBy('receivedAt', descending: true).snapshots().listen(expectAsync1((snapshot) {
           final docs = snapshot.docs;
           try {
             if (descCalled == 0) {
@@ -1120,8 +997,7 @@ void main() {
             .orderBy('receivedAt')
             .where('archived', isEqualTo: false)
             .snapshots()
-            .map((snapshot) =>
-                snapshot.docs.map((d) => d.get('content')).toList()),
+            .map((snapshot) => snapshot.docs.map((d) => d.get('content')).toList()),
         emitsInOrder(unarchivedAscContents));
 
     // add data
@@ -1239,11 +1115,7 @@ void main() {
       'state': 'Washington',
     });
 
-    final snapshots = await instance
-        .collection('cities')
-        .orderBy('name')
-        .orderBy('state')
-        .get();
+    final snapshots = await instance.collection('cities').orderBy('name').orderBy('state').get();
 
     expect(snapshots.docs.toData(), [
       {
@@ -1297,8 +1169,7 @@ void main() {
       'state': 'Washington',
     });
 
-    final baseQuery =
-        instance.collection('cities').orderBy('name').orderBy('state');
+    final baseQuery = instance.collection('cities').orderBy('name').orderBy('state');
 
     // should get everything because it is before any document in the DB
     var snapshots = await baseQuery.startAt(['Alaska']).get();
@@ -1397,8 +1268,7 @@ void main() {
       'state': 'Washington',
     });
 
-    final baseQuery =
-        instance.collection('cities').orderBy('name').orderBy('state');
+    final baseQuery = instance.collection('cities').orderBy('name').orderBy('state');
 
     var snapshots = await baseQuery.endAt(toIterable(['Arizona'])).get();
     expect(snapshots.docs.toData(), []);
@@ -1434,8 +1304,7 @@ void main() {
       },
     ]);
 
-    snapshots =
-        await baseQuery.endAt(toIterable(['Springfield', 'Missouri'])).get();
+    snapshots = await baseQuery.endAt(toIterable(['Springfield', 'Missouri'])).get();
 
     expect(snapshots.docs.toData(), [
       {
@@ -1484,13 +1353,10 @@ void main() {
 
     final firestore = FakeFirebaseFirestore();
 
-    final moviesCollection = firestore
-        .collection('movies')
-        .withConverter(fromFirestore: from, toFirestore: to);
+    final moviesCollection = firestore.collection('movies').withConverter(fromFirestore: from, toFirestore: to);
     await moviesCollection.add(Movie()..title = 'A long time ago');
     await moviesCollection.add(Movie()..title = 'Robot from the future');
-    final searchResults =
-        await moviesCollection.orderBy('title').startAt(['R']).get();
+    final searchResults = await moviesCollection.orderBy('title').startAt(['R']).get();
     expect(searchResults.size, equals(1));
     final movieFound = searchResults.docs.first.data();
     expect(movieFound.title, equals('Robot from the future'));
@@ -1513,64 +1379,48 @@ void main() {
     });
 
     test('isEqualTo', () async {
-      final querySnapshot =
-          await collection.where('date', isEqualTo: todayDate).get();
+      final querySnapshot = await collection.where('date', isEqualTo: todayDate).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
     test('isNotEqualTo', () async {
-      final querySnapshot = await collection
-          .where('date', isNotEqualTo: todayDate.add(Duration(days: 1)))
-          .get();
+      final querySnapshot = await collection.where('date', isNotEqualTo: todayDate.add(Duration(days: 1))).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
     test('isGreaterThan', () async {
-      final querySnapshot = await collection
-          .where('date', isGreaterThan: todayDate.subtract(Duration(days: 1)))
-          .get();
+      final querySnapshot = await collection.where('date', isGreaterThan: todayDate.subtract(Duration(days: 1))).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
     test('isGreaterThanOrEqualTo', () async {
-      final querySnapshot = await collection
-          .where('date',
-              isGreaterThanOrEqualTo: todayDate.subtract(Duration(days: 1)))
-          .get();
+      final querySnapshot =
+          await collection.where('date', isGreaterThanOrEqualTo: todayDate.subtract(Duration(days: 1))).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
     test('isLessThan', () async {
-      final querySnapshot = await collection
-          .where('date', isLessThan: todayDate.add(Duration(days: 1)))
-          .get();
+      final querySnapshot = await collection.where('date', isLessThan: todayDate.add(Duration(days: 1))).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
     test('isLessThanOrEqualTo', () async {
-      final querySnapshot = await collection
-          .where('date', isLessThanOrEqualTo: todayDate.add(Duration(days: 1)))
-          .get();
+      final querySnapshot = await collection.where('date', isLessThanOrEqualTo: todayDate.add(Duration(days: 1))).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
     test('arrayContains', () async {
-      final querySnapshot =
-          await collection.where('dates', arrayContains: todayDate).get();
+      final querySnapshot = await collection.where('dates', arrayContains: todayDate).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
     test('arrayContainsAny', () async {
-      final querySnapshot = await collection
-          .where('dates', arrayContainsAny: toIterable([todayDate]))
-          .get();
+      final querySnapshot = await collection.where('dates', arrayContainsAny: toIterable([todayDate])).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
     test('whereIn', () async {
-      final querySnapshot = await collection
-          .where('date', whereIn: toIterable([todayDate]))
-          .get();
+      final querySnapshot = await collection.where('date', whereIn: toIterable([todayDate])).get();
       expect(querySnapshot.docs, isNotEmpty);
     });
 
@@ -1600,24 +1450,16 @@ void main() {
       expect((await count.get()).count, 1);
 
       // Query.
-      expect(
-          (await messages.where('text', isEqualTo: 'hello!').count().get())
-              .count,
-          1);
+      expect((await messages.where('text', isEqualTo: 'hello!').count().get()).count, 1);
     });
 
     test('converted queries', () async {
       final firestore = FakeFirebaseFirestore();
-      final movies = firestore
-          .collection('movies')
-          .withConverter(fromFirestore: from, toFirestore: to);
+      final movies = firestore.collection('movies').withConverter(fromFirestore: from, toFirestore: to);
       await movies.add(Movie()..title = 'Test Movie');
 
-      final query = firestore
-          .collection('movies')
-          .where('title', isEqualTo: 'Test Movie');
-      final convertedQuery =
-          query.withConverter(fromFirestore: from, toFirestore: to);
+      final query = firestore.collection('movies').where('title', isEqualTo: 'Test Movie');
+      final convertedQuery = query.withConverter(fromFirestore: from, toFirestore: to);
       expect((await convertedQuery.count().get()).count, 1);
     });
   });
@@ -1722,17 +1564,13 @@ void main() {
     test('get', () async {
       final firestore = FakeFirebaseFirestore();
       final movies = firestore.collection('movies');
-      final query = firestore
-          .collection('movies')
-          .where('title', isEqualTo: 'Test Movie');
+      final query = firestore.collection('movies').where('title', isEqualTo: 'Test Movie');
 
       await movies.add({
         'title': 'Test Movie',
       });
 
-      whenCalling(Invocation.method(#get, null))
-          .on(query)
-          .thenThrow(FirebaseException(plugin: 'firestore'));
+      whenCalling(Invocation.method(#get, null)).on(query).thenThrow(FirebaseException(plugin: 'firestore'));
 
       expect(
         () async => await query.get(GetOptions(source: Source.server)),
@@ -1852,11 +1690,7 @@ void main() {
 
     expect(
       // Query with composite key
-      db
-          .collection('docs')
-          .where('traits.name', isEqualTo: 'Norman')
-          .snapshots()
-          .map((event) {
+      db.collection('docs').where('traits.name', isEqualTo: 'Norman').snapshots().map((event) {
         return event.docs.map((e) => e.get('traits.name')).toList();
       }),
       emitsInOrder(expectedEmitOrder),
@@ -1867,6 +1701,65 @@ void main() {
       'traits': {
         'name': 'Norman',
       },
+    });
+  });
+
+  test('Should return previous snapshot on removed document change type', () async {
+    final db = FakeFirebaseFirestore();
+
+    final expectedEmitOrder = [
+      [],
+      [
+        [
+          DocumentChangeType.added,
+          {
+            'profile': {'name': 'Peter'}
+          }
+        ]
+      ],
+      [
+        [
+          DocumentChangeType.modified,
+          {
+            'profile': {'name': 'Peter', 'surname': 'Parker'}
+          }
+        ]
+      ],
+      [
+        [
+          DocumentChangeType.removed,
+          {
+            'profile': {'name': 'Peter', 'surname': 'Parker'}
+          }
+        ]
+      ],
+    ];
+
+    /// Initial data before snapshots subscription.
+    await db.collection('docs').doc('1').set(<String, dynamic>{
+      'profile': {'name': 'Norman'}
+    });
+
+    expect(
+      db.collection('docs').where('profile.name', isEqualTo: 'Peter').snapshots(includeMetadataChanges: true).map(
+        (event) {
+          return event.docChanges.map((e) => [e.type, e.doc.data()]).toList();
+        },
+      ),
+      emitsInOrder(expectedEmitOrder),
+    );
+
+    await db.collection('docs').doc('1').set(<String, dynamic>{
+      'profile': {'name': 'Peter'},
+    });
+
+    await db.collection('docs').doc('1').set(<String, dynamic>{
+      'profile': {'name': 'Peter', 'surname': 'Parker'}
+    });
+
+    /// Update the document to mimic the removed document for the given query
+    await db.collection('docs').doc('1').set(<String, dynamic>{
+      'profile': {'name': 'Norman', 'surname': 'Osborn'}
     });
   });
 }
