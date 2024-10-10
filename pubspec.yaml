@@ -10,14 +10,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cloud_firestore: 4.15.9
-  cloud_firestore_platform_interface: 6.1.10
+  cloud_firestore: ^5.4.4
+  cloud_firestore_platform_interface: ^6.4.3
   collection: ^1.14.13
-  plugin_platform_interface: ^2.0.0
+  plugin_platform_interface: ^2.1.8
   quiver: ^3.0.0
   rxdart: ^0.27.1
   mock_exceptions: ^0.8.2
-  fake_firebase_security_rules: ^0.5.2
+  fake_firebase_security_rules: ^0.5.3
   rx: ^0.3.0
   equatable: ^2.0.5
   clock: ^1.1.1
@@ -29,7 +29,7 @@ dev_dependencies:
     sdk: flutter
   pedantic: ^1.9.0
   test: ^1.15.2
-  firebase_auth_mocks: ^0.13.0
+  firebase_auth_mocks: ^0.14.1
 
 false_secrets:
   - google-services.json

@@ -18,8 +18,7 @@ import 'util.dart';
 const snapshotsStreamKey = '_snapshots';
 
 // ignore: subtype_of_sealed_class
-class MockDocumentReference<T extends Object?>
-    implements DocumentReference<T>, Equatable {
+class MockDocumentReference<T extends Object?> implements DocumentReference<T>, Equatable {
   final String _id;
   final Map<String, dynamic> root;
   final Map<String, dynamic> docsData;
@@ -36,21 +35,21 @@ class MockDocumentReference<T extends Object?>
 
   StreamController<DocumentSnapshot<T>> get snapshotStreamController {
     if (!snapshotStreamControllerRoot.containsKey(typedSnapshotsStreamKey)) {
-      snapshotStreamControllerRoot[typedSnapshotsStreamKey] =
-          StreamController<DocumentSnapshot<T>>.broadcast();
+      snapshotStreamControllerRoot[typedSnapshotsStreamKey] = StreamController<DocumentSnapshot<T>>.broadcast();
     }
     return snapshotStreamControllerRoot[typedSnapshotsStreamKey];
   }
 
   MockDocumentReference(
-      this._firestore,
-      this._path,
-      this._id,
-      this.root,
-      this.docsData,
-      this.rootParent,
-      this.snapshotStreamControllerRoot,
-      this._converter);
+    this._firestore,
+    this._path,
+    this._id,
+    this.root,
+    this.docsData,
+    this.rootParent,
+    this.snapshotStreamControllerRoot,
+    this._converter,
+  );
 
   @override
   FirebaseFirestore get firestore => _firestore;
@@ -88,11 +87,12 @@ class MockDocumentReference<T extends Object?>
   CollectionReference<Map<String, dynamic>> collection(String collectionPath) {
     final path = [_path, collectionPath].join('/');
     return MockCollectionReference(
-        _firestore,
-        path,
-        getSubpath(root, collectionPath),
-        docsData,
-        getSubpath(snapshotStreamControllerRoot, collectionPath));
+      _firestore,
+      path,
+      getSubpath(root, collectionPath),
+      docsData,
+      getSubpath(snapshotStreamControllerRoot, collectionPath),
+    );
   }
 
   @override
@@ -145,8 +145,7 @@ class MockDocumentReference<T extends Object?>
       _applyValues(document, key, value);
     });
     _firestore.saveDocument(path);
-    await QuerySnapshotStreamManager()
-        .fireSnapshotUpdate<T>(firestore, path, id: id);
+    await QuerySnapshotStreamManager().fireSnapshotUpdate<T>(firestore, path, id: id);
     fireSnapshotUpdate();
     return Future.value(null);
   }
@@ -154,8 +153,7 @@ class MockDocumentReference<T extends Object?>
   void _applyValues(Map<String, dynamic> document, String key, dynamic value) {
     // Handle the recursive case.
     if (value is Map<String, dynamic>) {
-      if (!document.containsKey(key) ||
-          !(document[key] is Map<String, dynamic>)) {
+      if (!document.containsKey(key) || !(document[key] is Map<String, dynamic>)) {
         document[key] = <String, dynamic>{};
       }
       value.forEach((subkey, subvalue) {
@@ -194,8 +192,7 @@ class MockDocumentReference<T extends Object?>
     // For N elements, iterate until N-1 element.
     // For example, key: "foo.bar.baz", this method return the document pointed by
     // 'foo.bar'. The document will be updated by the caller on 'baz' field
-    final keysToIterate =
-        compositeKeyElements.sublist(0, compositeKeyElements.length - 1);
+    final keysToIterate = compositeKeyElements.sublist(0, compositeKeyElements.length - 1);
     for (final keyElement in keysToIterate) {
       if (!document.containsKey(keyElement) || !(document[keyElement] is Map)) {
         document[keyElement] = <String, dynamic>{};
@@ -239,8 +236,16 @@ class MockDocumentReference<T extends Object?>
     // rawDocumentReference manually.
     final rawDocumentReference = _converter == null
         ? this as DocumentReference<Map<String, dynamic>>
-        : MockDocumentReference<Map<String, dynamic>>(_firestore, _path, _id,
-            root, docsData, rootParent, snapshotStreamControllerRoot, null);
+        : MockDocumentReference<Map<String, dynamic>>(
+            _firestore,
+            _path,
+            _id,
+            root,
+            docsData,
+            rootParent,
+            snapshotStreamControllerRoot,
+            null,
+          );
     final rawSnapshot = MockDocumentSnapshot<Map<String, dynamic>>(
       rawDocumentReference,
       _id,
@@ -260,8 +265,7 @@ class MockDocumentReference<T extends Object?>
       final exists = _exists();
       // If the document does not exist (eg has been deleted), there is no data
       // to convert. The data is null.
-      final convertedData =
-          exists ? _converter!.fromFirestore(rawSnapshot, null) : null;
+      final convertedData = exists ? _converter!.fromFirestore(rawSnapshot, null) : null;
       final convertedSnapshot = MockDocumentSnapshot<T>(
         this,
         _id,
@@ -288,15 +292,17 @@ class MockDocumentReference<T extends Object?>
     _firestore.removeSavedDocument(path);
     docsData.remove(path);
     // Notify on the parent collection.
-    await QuerySnapshotStreamManager()
-        .fireSnapshotUpdate<T>(firestore, path, id: id);
+    await QuerySnapshotStreamManager().fireSnapshotUpdate<T>(firestore, path, id: id);
     // Notify the document listeners.
     fireSnapshotUpdate();
     return Future.value();
   }
 
   @override
-  Stream<DocumentSnapshot<T>> snapshots({bool includeMetadataChanges = false}) {
+  Stream<DocumentSnapshot<T>> snapshots({
+    bool includeMetadataChanges = false,
+    ListenSource source = ListenSource.defaultSource,
+  }) {
     return snapshotStreamController.stream.startWith(_getSync());
   }
 
@@ -305,24 +311,23 @@ class MockDocumentReference<T extends Object?>
   }
 
   @override
-  bool operator ==(Object o) =>
-      o is DocumentReference && o.firestore == _firestore && o.path == _path;
+  bool operator ==(Object o) => o is DocumentReference && o.firestore == _firestore && o.path == _path;
 
   @override
   int get hashCode => _path.hashCode + _firestore.hashCode;
 
   @override
-  DocumentReference<R> withConverter<R>(
-      {required fromFirestore, required toFirestore}) {
+  DocumentReference<R> withConverter<R>({required fromFirestore, required toFirestore}) {
     return MockDocumentReference<R>(
-        _firestore,
-        _path,
-        _id,
-        root,
-        docsData,
-        rootParent,
-        snapshotStreamControllerRoot,
-        Converter(fromFirestore, toFirestore));
+      _firestore,
+      _path,
+      _id,
+      root,
+      docsData,
+      rootParent,
+      snapshotStreamControllerRoot,
+      Converter(fromFirestore, toFirestore),
+    );
   }
 
   // Used for throwing exceptions correctly.
